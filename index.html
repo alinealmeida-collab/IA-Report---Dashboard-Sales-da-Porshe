@@ -1,242 +1,190 @@
 <!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Painel de Vendas Porsche</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Semi+Condensed:wght@500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap">
 <style>
-/* Layout: leitura executiva em camadas (filtros, KPIs, leitura rápida, análise por cidade, mix por família e modelos, ranking de vendedores). Paleta Porsche: Primary #010205, Background #FFFFFF/#EEEFF2, contraste cinza, Vermelho Guards só para o líder. */
+/* Layout: página de relatório Power BI. Canvas cinza, visuais brancos com borda fina e título à esquerda, slicers em lista suspensa, cartões de KPI, grade de 12 colunas. Cores Porsche: preto #010205, ouro, vermelho Guards só para o líder. */
 :root{
-  --bg:#FFFFFF; --surface:#EEEFF2; --line:#D8D8DB; --fg:#010205; --fg-2:#535457; --muted:#6B6D70;
-  --bar:#B8914A; --lead:#D5001C; --on-primary:#FFFFFF; --focus:#1A44EA; --shadow:0 8px 24px rgba(1,2,5,.16);
-  --font:'Barlow','Porsche Next','Arial Narrow',Arial,sans-serif;
+  --canvas:#F3F2F1; --bg:#FFFFFF; --surface:#F3F2F1; --band:#FAF9F8; --line:#E1DFDD; --vb:#E1DFDD; --ctl:#8A8886;
+  --fg:#252423; --fg-2:#484644; --muted:#605E5C;
+  --bar:#B8914A; --soft:#B7B8BB; --lead:#D5001C; --on-primary:#FFFFFF; --focus:#1A44EA; --shadow:0 6px 18px rgba(0,0,0,.18);
+  --font:'Segoe UI','Segoe UI Web (West European)','Open Sans',-apple-system,BlinkMacSystemFont,Roboto,'Helvetica Neue',Arial,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#0E0E12; --surface:#212225; --line:#404044; --fg:#FBFCFF; --fg-2:#AFB0B3; --muted:#88898C;
-  --bar:#C9A765; --lead:#F2323F; --on-primary:#010205; --shadow:0 8px 24px rgba(0,0,0,.5); color-scheme:dark}}
+  --canvas:#0B0B0D; --bg:#18191C; --surface:#232427; --band:#1D1E21; --line:#34363A; --vb:#34363A; --ctl:#7E7F82;
+  --fg:#F3F2F1; --fg-2:#C8C6C4; --muted:#A19F9D;
+  --bar:#C9A765; --soft:#5A5B5F; --lead:#F2323F; --on-primary:#010205; --shadow:0 6px 18px rgba(0,0,0,.6); color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#0E0E12; --surface:#212225; --line:#404044; --fg:#FBFCFF; --fg-2:#AFB0B3; --muted:#88898C;
-  --bar:#C9A765; --lead:#F2323F; --on-primary:#010205; --shadow:0 8px 24px rgba(0,0,0,.5); color-scheme:dark}
+  --canvas:#0B0B0D; --bg:#18191C; --surface:#232427; --band:#1D1E21; --line:#34363A; --vb:#34363A; --ctl:#7E7F82;
+  --fg:#F3F2F1; --fg-2:#C8C6C4; --muted:#A19F9D;
+  --bar:#C9A765; --soft:#5A5B5F; --lead:#F2323F; --on-primary:#010205; --shadow:0 6px 18px rgba(0,0,0,.6); color-scheme:dark}
 *{box-sizing:border-box}
-body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px;line-height:1.5;font-variant-numeric:tabular-nums;
-  padding-block:0 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-.wrap{max-width:1280px;margin:0 auto}
+body{background:var(--canvas);color:var(--fg);font-family:var(--font);font-size:14px;line-height:1.45;font-variant-numeric:tabular-nums;
+  padding-block:0 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1440px;margin:0 auto}
 button,input{font:inherit;color:inherit}
 button{cursor:pointer}
 :focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.eyebrow{font-family:'Barlow Semi Condensed',var(--font);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:600}
 
-header.hero{margin-top:24px;margin-bottom:24px;background:#010205;color:#FBFCFF;border-radius:8px;padding:36px clamp(20px,4vw,48px) 0;display:flex;flex-wrap:wrap;gap:8px 32px;align-items:flex-end;justify-content:space-between;overflow:hidden}
-.hero-txt{padding-bottom:36px}
-.hero .car{width:min(100%,520px);height:auto;display:block;flex:1 1 320px;max-width:520px;margin-left:auto}
-.brand{font-weight:700;letter-spacing:.5em;font-size:13px;color:#C9A765}
-h1{font-weight:600;font-size:clamp(28px,4vw,44px);line-height:1.05;letter-spacing:-.015em;margin:14px 0 0;text-wrap:balance}
-header p{margin:12px 0 0;color:#AFB0B3;font-size:15px}
+header.hero{margin-top:16px;background:#010205;color:#FBFCFF;padding:20px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 24px;border-bottom:3px solid #C9A765}
+.brand{font-weight:700;letter-spacing:.5em;font-size:12px;color:#C9A765}
+h1{font-weight:600;font-size:clamp(22px,3vw,30px);line-height:1.15;margin:4px 0 0}
+header p{margin:0;color:#C8C6C4;font-size:13px}
 
-.filters{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-block:1px solid var(--line);padding-block:14px}
-.filters .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-@media(min-width:760px){.filters .row{grid-template-columns:repeat(5,minmax(0,1fr)) auto}}
-@media(max-width:759px){.filters{position:static}}
+.vis{background:var(--bg);border:1px solid var(--vb);border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:12px 16px 16px;min-width:0}
+.vh{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 16px;margin-bottom:12px}
+.vh h3{margin:0;font-size:14px;font-weight:600;color:var(--fg)}
+.vh .sub{font-size:12px;color:var(--muted);font-weight:400;margin-left:8px}
+.ins{margin:-6px 0 12px;color:var(--muted);font-size:12.5px}
+.ins b{color:var(--fg)}
+
+.slicers{margin-top:12px;position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--canvas);padding-block:0 0}
+.slicers .vis{padding:10px 16px 12px}
+.filters .row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px}
+@media(min-width:760px){.filters .row{grid-template-columns:repeat(5,minmax(0,1fr)) auto;align-items:end}}
+@media(max-width:759px){.slicers{position:static}}
 .ms{position:relative;min-width:0}
-.ms-btn{width:100%;text-align:left;background:var(--bg);border:1px solid var(--fg-2);border-radius:4px;padding:8px 12px;display:flex;flex-direction:column;min-width:0;min-height:56px;justify-content:center}
+.ms-l{display:block;font-size:12px;color:var(--fg-2);font-weight:600;margin-bottom:3px}
+.ms-btn{width:100%;text-align:left;background:var(--bg);border:1px solid var(--ctl);border-radius:2px;padding:0 30px 0 8px;height:32px;display:flex;align-items:center;min-width:0;position:relative}
+.ms-btn::after{content:"";position:absolute;right:11px;top:10px;width:6px;height:6px;border-right:1.5px solid var(--fg-2);border-bottom:1.5px solid var(--fg-2);transform:rotate(45deg)}
+.ms.open .ms-btn::after{top:13px;transform:rotate(-135deg)}
 .ms-btn:hover{border-color:var(--fg)}
-.ms.open .ms-btn,.ms-btn.on{border-color:var(--fg);box-shadow:inset 0 0 0 1px var(--fg)}
-.ms-l{font-size:12px;color:var(--muted);font-weight:500}
-.ms-v{font-size:15px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
-.ms-panel{position:absolute;top:calc(100% + 4px);left:0;width:max(100%,280px);max-width:calc(100vw - 32px);background:var(--bg);border:1px solid var(--line);border-radius:8px;z-index:30;box-shadow:var(--shadow);overflow:hidden}
+.ms-btn.on{border-color:var(--bar);box-shadow:inset 0 0 0 1px var(--bar)}
+.ms-v{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.ms-panel{position:absolute;top:calc(100% + 2px);left:0;width:max(100%,260px);max-width:calc(100vw - 32px);background:var(--bg);border:1px solid var(--line);border-radius:2px;z-index:30;box-shadow:var(--shadow);overflow:hidden}
 .ms:nth-child(even) .ms-panel{left:auto;right:0}
 @media(min-width:760px){.ms:nth-child(even) .ms-panel{left:0;right:auto}.ms:nth-child(n+4) .ms-panel{left:auto;right:0}}
-.ms-panel input[type=search]{width:100%;background:var(--surface);color:var(--fg);border:0;padding:12px 14px;font-size:15px;border-radius:0}
-.ms-list{max-height:260px;overflow:auto;padding:4px 0}
-.ms-list label{display:flex;gap:10px;align-items:center;padding:7px 14px;cursor:pointer;font-size:15px}
+.ms-panel input[type=search]{width:100%;background:var(--bg);color:var(--fg);border:0;border-bottom:1px solid var(--line);padding:8px 10px;font-size:13px;border-radius:0}
+.ms-list{max-height:240px;overflow:auto;padding:2px 0}
+.ms-list label{display:flex;gap:8px;align-items:center;padding:5px 10px;cursor:pointer;font-size:13px}
 .ms-list label:hover{background:var(--surface)}
-.ms-list input{width:16px;height:16px;accent-color:var(--fg);margin:0}
-.ms-list em{margin-left:auto;font-style:normal;color:var(--muted);font-size:13px}
-.ms-foot{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:10px 14px;font-size:13px;color:var(--muted)}
-.ms-foot button{background:none;border:0;color:var(--fg);text-decoration:underline;padding:0;font-size:13px;font-weight:600}
-.btn{background:var(--fg);color:var(--on-primary);border:1px solid var(--fg);border-radius:4px;padding:0 22px;font-weight:600;min-height:56px;grid-column:1/-1}
+.ms-list input{width:14px;height:14px;accent-color:#010205;margin:0}
+.ms-list em{margin-left:auto;font-style:normal;color:var(--muted);font-size:12px}
+.ms-foot{display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:7px 10px;font-size:12px;color:var(--muted)}
+.ms-foot button{background:none;border:0;color:var(--fg);text-decoration:underline;padding:0;font-size:12px;font-weight:600}
+.btn{background:var(--bg);color:var(--fg);border:1px solid var(--ctl);border-radius:2px;padding:0 16px;font-weight:600;font-size:13px;height:32px;grid-column:1/-1}
 @media(min-width:760px){.btn{grid-column:auto}}
-.btn:hover{opacity:.85}
+.btn:hover{background:var(--surface)}
 
-.kpis{border-bottom:1px solid var(--line);display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+.kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:12px}
 @media(min-width:900px){.kpis{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.kpi{padding:28px 20px 24px 0;min-width:0}
-@media(min-width:900px){.kpi{padding-left:24px;border-left:1px solid var(--line)}.kpi:first-child{padding-left:0;border-left:0}}
-.kpi .v{font-weight:600;font-size:clamp(26px,2.6vw,34px);line-height:1.15;margin-top:6px;letter-spacing:-.01em;white-space:nowrap}
-.kpi .v.sm{font-size:clamp(22px,2.2vw,28px);white-space:normal}
-.kpi .s{color:var(--muted);font-size:14px;margin-top:2px}
+.kpi{background:var(--bg);border:1px solid var(--vb);border-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:14px 16px 12px;min-width:0;display:flex;flex-direction:column}
+.kpi .v{order:1;font-weight:300;font-size:clamp(20px,2.6vw,36px);line-height:1.15;white-space:nowrap;letter-spacing:-.01em}
+.kpi .eyebrow{order:2;font-size:13px;color:var(--fg-2);font-weight:600;margin-top:2px}
+.kpi .s{order:3;color:var(--muted);font-size:12px;margin-top:1px}
 
-.brief{background:var(--surface);border-radius:8px;padding:24px 28px;display:grid;gap:20px;grid-template-columns:minmax(0,1fr)}
-@media(min-width:900px){.brief{grid-template-columns:repeat(3,minmax(0,1fr));gap:32px}}
-.brief h4{margin:0 0 6px;font-size:13px;color:var(--muted);font-weight:600;letter-spacing:.08em;text-transform:uppercase}
-.brief p{margin:0;font-size:17px;line-height:1.4;font-weight:500;text-wrap:pretty}
-.brief b{font-weight:700}
-.brief .lead{color:var(--lead)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px;margin-top:12px}
+.grid>*{grid-column:span 12}
+@media(min-width:1100px){.s5{grid-column:span 5}.s7{grid-column:span 7}}
+.keyline{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:12px;color:var(--muted);margin:12px 2px 0}
+.keyline span{display:inline-flex;align-items:center;gap:6px}
+.keyline i{width:10px;height:10px;border-radius:1px;display:block}
 
-section{padding-block:64px 0}
-.sec-h{margin-bottom:28px;max-width:70ch}
-h2{font-weight:600;font-size:clamp(24px,2.6vw,30px);line-height:1.12;margin:8px 0 0;letter-spacing:-.01em;text-wrap:balance}
-.sec-h p{color:var(--fg-2);margin:10px 0 0}
-.keyline{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13.5px;color:var(--fg-2);margin-bottom:24px}
-.keyline span{display:inline-flex;align-items:center;gap:8px}
-.keyline i{width:12px;height:12px;border-radius:2px;display:block}
-.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,480px),1fr));gap:56px 72px;align-items:start;margin-top:64px}
-.keyline{margin-bottom:28px}
-.card h3{font-size:20px;font-weight:600;margin:0 0 4px;line-height:1.25}
-.card .ins{margin:0 0 20px;color:var(--fg-2);font-size:14.5px;max-width:60ch}
-.card .ins b{color:var(--fg)}
-
-/* barras horizontais */
+/* barras */
 .chart{display:flex;flex-direction:column}
-.cr{display:grid;gap:4px 14px;align-items:center;padding:7px 0;border-top:1px solid var(--line)}
-.cr:first-child{border-top:0}
-.c1{grid-template-columns:22px minmax(0,1fr)}
-.c1 .lm{display:none}
-.c1 .city{grid-column:2}
-.c1 .plot{grid-column:1/-1}
-@media(min-width:640px){
-  .c1{grid-template-columns:26px minmax(110px,170px) minmax(0,1fr) minmax(150px,240px)}
-  .c1 .city{grid-column:auto}.c1 .plot{grid-column:auto}
-  .c1 .lm{display:block}.c1 .city small{display:none}}
-.c1 .lm{font-size:14px;color:var(--fg-2);min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.c1 .lm b{color:var(--fg);font-weight:500}
-.c1 .lm:not(:has(b)){color:var(--muted)}
-.pos{font-weight:600;color:var(--muted);font-size:14px}
-.city{min-width:0;font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.city small{display:block;color:var(--muted);font-weight:400;font-size:13px}
+.cr{display:grid;gap:4px 12px;align-items:center;padding:5px 0}
+.pos{font-weight:600;color:var(--muted);font-size:13px}
 .plot{position:relative;height:22px;min-width:0}
-.plot .gl{position:absolute;top:-8px;bottom:-8px;width:1px;background:var(--line);opacity:.7}
-.plot .bar{position:absolute;left:0;top:3px;height:16px;border-radius:0 4px 4px 0;background:var(--bar);min-width:3px}
+.plot .bar{position:absolute;left:0;top:2px;height:18px;border-radius:0;background:var(--bar);min-width:3px}
 .plot .bar.lead{background:var(--lead)}
-.plot .val{position:absolute;top:0;line-height:22px;font-size:14px;font-weight:600;padding-left:8px;white-space:nowrap}
-.axis{position:relative;height:20px;font-size:12px;color:var(--muted)}
-.axis span{position:absolute;transform:translateX(-50%)}
-.axisrow{display:grid;gap:14px;grid-template-columns:22px minmax(0,1fr)}
-@media(min-width:640px){.axisrow{grid-template-columns:26px 130px minmax(0,1fr) 170px}.axisrow .ax{grid-column:3}}
-.axisrow .ax{grid-column:2}
+.plot .val{position:absolute;top:0;line-height:22px;font-size:12.5px;font-weight:600;padding-left:6px;white-space:nowrap}
+.c2{grid-template-columns:minmax(120px,170px) minmax(0,1fr)}
+.c2 .nm{font-weight:600;min-width:0;font-size:13px}
+.c2 .nm small{display:block;color:var(--muted);font-weight:400;font-size:12px;white-space:nowrap}
+.c2 .plot{display:flex;align-items:center}.c2 .bw{position:relative;flex:1;height:22px;min-width:0}.c2 .val{position:static;flex:none}
+.c2 .nm small{white-space:normal}
+@media(max-width:640px){.c2{grid-template-columns:minmax(0,1fr)}}
+.c3{grid-template-columns:minmax(96px,140px) minmax(0,1fr)}
+.c3 .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:13px}
+.chart .cr+.cr{border-top:1px solid var(--line)}
 
-.c2{grid-template-columns:minmax(150px,190px) minmax(0,1fr)}
-.c2 .nm small{white-space:nowrap}
-.c2 .nm{font-weight:600;min-width:0}
-.c2 .nm small{display:block;color:var(--muted);font-weight:400;font-size:13px}
-.c2 .plot{display:flex;align-items:center;gap:0}.c2 .bw{position:relative;flex:1;height:22px;min-width:0}.c2 .val{position:static;flex:none}
-.c3{grid-template-columns:minmax(96px,150px) minmax(0,1fr)}
-.c3 .nm{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:15px}
-.stack{display:flex;flex-direction:column;gap:36px}
+.pie{display:flex;flex-wrap:wrap;gap:16px 28px;align-items:center;justify-content:center}
+.pie svg{width:210px;height:210px;flex:none;display:block}
+.pie .sl{stroke:var(--bg);stroke-width:2}
+.pie .num{font-family:var(--font);font-weight:700;font-size:14px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.plg{flex:1 1 200px;min-width:0;display:flex;flex-direction:column}
+.pl{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:2px 10px;align-items:baseline;padding:8px 0;border-top:1px solid var(--line)}
+.pl:first-child{border-top:0}
+.pl i{width:11px;height:11px;border-radius:1px;display:block;align-self:center}
+.pl b{font-weight:600;font-size:13px}.pl .n{font-weight:700;font-size:16px}
+.pl small{grid-column:2/-1;color:var(--muted);font-size:12px;line-height:1.35}
 
-.tools{display:flex;flex-wrap:wrap;gap:12px 24px;justify-content:space-between;align-items:center;margin-bottom:12px}
-.search{background:var(--surface);color:var(--fg);border:1px solid transparent;border-radius:4px;padding:10px 14px;min-width:240px;max-width:100%;font-size:15px}
-.tw{overflow:auto;border-top:2px solid var(--fg)}
-table{border-collapse:collapse;width:100%;min-width:640px;font-size:15px}
-th{position:sticky;top:0;background:var(--bg);text-align:left;font-size:13px;color:var(--muted);font-weight:600;padding:12px 12px 12px 0;border-bottom:1px solid var(--line)}
-td{padding:11px 12px 11px 0;border-bottom:1px solid var(--line);vertical-align:top}
-th.r,td.r{text-align:right;padding-right:0}
-td .st{color:var(--muted);font-size:13px;margin-left:6px;font-weight:400}
+.tw{overflow:auto}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:13px}
+th{text-align:left;font-size:12px;color:var(--fg);font-weight:700;padding:7px 10px;border-bottom:2px solid var(--fg);background:var(--bg);white-space:nowrap}
+td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+tbody tr:nth-child(even) td{background:var(--band)}
+th.r,td.r{text-align:right}
 td strong{font-weight:600}
-td .tie{display:inline-block;margin-left:8px;font-size:12px;color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 6px}
-
-.seg-ctl{display:inline-flex;border:1px solid var(--fg);border-radius:4px;overflow:hidden}
-.seg-ctl button{background:var(--bg);border:0;padding:0 20px;font-weight:600;font-size:14px;min-height:44px}
-.seg-ctl button[aria-pressed="true"]{background:var(--fg);color:var(--on-primary)}
-.sec-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:16px}
-
-.rank{display:flex;flex-direction:column;border-top:2px solid var(--fg)}
-.rk{display:grid;grid-template-columns:48px minmax(0,1fr);gap:12px 16px;padding:22px 0;border-bottom:1px solid var(--line)}
-@media(min-width:900px){.rk{grid-template-columns:56px minmax(190px,.8fr) minmax(0,1.5fr);gap:28px}}
-.rk .no{font-size:44px;font-weight:600;line-height:1;letter-spacing:-.03em;color:var(--muted)}
-.rk:first-child .no{color:var(--lead)}
-.who{min-width:0}
-.who .nm{font-size:21px;font-weight:600;line-height:1.2}
-.who .mt{display:flex;flex-wrap:wrap;gap:2px 18px;margin-top:6px;color:var(--fg-2);font-size:15px}
-.who .mt b{color:var(--fg);font-weight:600}
-.who .tag{margin-top:10px;font-size:14px;color:var(--fg-2)}
-.mods{grid-column:1/-1;display:flex;flex-direction:column;gap:8px;min-width:0}
-@media(min-width:900px){.mods{grid-column:auto}}
-.mod{display:grid;grid-template-columns:minmax(100px,170px) minmax(0,1fr) 26px;gap:12px;align-items:center;font-size:15px}
-.mod .nm2{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mod .bar{height:12px;border-radius:0 3px 3px 0;background:var(--bar)}
-.mod.top .bar{background:var(--lead)}
-.mod.top .nm2{font-weight:600}
-.mod .c{text-align:right;font-weight:600}
-.empty{padding:36px 0;color:var(--muted);text-align:center}
-footer{margin-top:64px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:13.5px;max-width:95ch}
-#tip{position:fixed;z-index:60;pointer-events:none;background:var(--fg);color:var(--on-primary);padding:8px 12px;border-radius:4px;font-size:14px;white-space:pre-line;max-width:280px;opacity:0;transition:opacity .15s}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-
 .no{font-weight:600;color:var(--muted)}.no.first{color:var(--lead)}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{border:1px solid var(--line);border-radius:4px;padding:1px 10px;font-size:14px;color:var(--fg-2);white-space:nowrap}
+.chips{display:flex;flex-wrap:wrap;gap:4px}
+.chip{border:1px solid var(--line);background:var(--bg);border-radius:2px;padding:0 7px;font-size:12px;color:var(--fg-2);white-space:nowrap}
 .chip em{font-style:normal;color:var(--muted)}
-.chip.top{border-color:var(--fg);color:var(--fg);font-weight:600}
-td:last-child,th:last-child{padding-left:28px}
+.chip.top{border-color:var(--bar);color:var(--fg);font-weight:600;box-shadow:inset 0 0 0 1px var(--bar)}
+.seg-ctl{display:inline-flex;border:1px solid var(--ctl);border-radius:2px;overflow:hidden}
+.seg-ctl button{background:var(--bg);border:0;padding:0 12px;font-weight:600;font-size:12px;height:26px}
+.seg-ctl button+button{border-left:1px solid var(--ctl)}
+.seg-ctl button[aria-pressed="true"]{background:#010205;color:#FFFFFF}
+.empty{padding:28px 0;color:var(--muted);text-align:center}
+footer{margin-top:16px;color:var(--muted);font-size:12px;max-width:110ch}
+#tip{position:fixed;z-index:60;pointer-events:none;background:var(--bg);color:var(--fg);border:1px solid var(--line);box-shadow:var(--shadow);padding:8px 12px;border-radius:2px;font-size:12.5px;white-space:pre-line;max-width:280px;opacity:0;transition:opacity .12s}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
 <div class="wrap">
 <header class="hero">
-  <div class="hero-txt">
+  <div>
     <div class="brand">PORSCHE</div>
     <h1>Painel de Vendas</h1>
-    <p>Valores em dólares americanos (US$).</p>
   </div>
-  <svg class="car" viewBox="0 0 620 170" role="img" aria-label="Silhueta de um carro esportivo">
-    <g fill="none" stroke="#C9A765" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M22 120 C22 100 46 94 96 92 L180 88 C222 58 284 44 340 46 C392 48 436 66 462 88 L548 96 C580 100 598 108 598 120 L598 126 L506 126 M440 126 L196 126 M130 126 L22 126 Z"/>
-      <path d="M200 88 C232 66 282 56 330 58 C376 60 412 74 436 90 Z"/>
-      <path d="M318 58 L322 90 M96 92 C150 98 190 98 230 94 M430 98 C480 104 530 104 560 100"/>
-      <circle cx="162" cy="126" r="34"/><circle cx="162" cy="126" r="20"/><circle cx="162" cy="126" r="5"/>
-      <circle cx="474" cy="126" r="34"/><circle cx="474" cy="126" r="20"/><circle cx="474" cy="126" r="5"/>
-    </g>
-    <path d="M0 161 H620" stroke="#404044" stroke-width="1.5"/>
-  </svg>
+  <p>Valores em dólares americanos (US$)</p>
 </header>
 
-<div class="filters"><div class="row" id="filters"></div></div>
+<div class="slicers"><div class="vis filters"><div class="row" id="filters"></div></div></div>
 
 <div class="kpis" id="kpis"></div>
 
-<section>
-  <div class="sec-h">
-    <h2>Cidades e modelos</h2>
-  </div>
-  <div class="keyline"><span><i style="background:var(--lead)"></i>Líder (inclui empates)</span><span><i style="background:var(--bar)"></i>Demais</span></div>
-  <div class="card">
-    <h3>Top 10 cidades em unidades vendidas</h3>
-    <p class="ins" id="cityIns"></p>
-    <div class="chart" id="cityBars"></div>
-  </div>
-  <div class="pair">
-    <div class="card">
-      <h3>Top 8 modelos em unidades</h3>
-      <p class="ins" id="modIns"></p>
-      <div class="chart" id="modelBars"></div>
-    </div>
-    <div class="card">
-      <h3>Receita por família de modelo</h3>
-      <p class="ins" id="famIns"></p>
-      <div class="chart" id="famBars"></div>
-    </div>
-  </div>
-</section>
+<div class="keyline"><span><i style="background:var(--lead)"></i>Líder (inclui empates)</span><span><i style="background:var(--bar)"></i>Demais</span></div>
 
-<section>
-  <div class="sec-top sec-h" style="max-width:none">
-    <div style="max-width:70ch">
-      <h2>Top 5 vendedores</h2>
-      <p id="rankIns" style="margin-top:8px"></p>
-    </div>
-    <div class="seg-ctl" role="group" aria-label="Critério do ranking">
-      <button id="byUnits" aria-pressed="true">Unidades</button><button id="byRev" aria-pressed="false">Receita</button>
-    </div>
+<div class="grid" style="margin-top:8px">
+  <div class="vis s5">
+    <div class="vh"><h3>Status das vendas</h3><span class="sub">unidades</span></div>
+    <div class="pie" id="stPie"></div>
   </div>
-  <div id="rank"></div>
-</section>
+  <div class="vis s7">
+    <div class="vh"><h3>Top 8 modelos em unidades</h3></div>
+    <p class="ins" id="modIns"></p>
+    <div class="chart" id="modelBars"></div>
+  </div>
+  <div class="vis s5">
+    <div class="vh"><h3>Receita por família de modelo</h3></div>
+    <div class="chart" id="famBars"></div>
+  </div>
+  <div class="vis s7">
+    <div class="vh"><h3>Top 5 vendedores</h3>
+      <div class="seg-ctl" role="group" aria-label="Critério do ranking">
+        <button id="byUnits" aria-pressed="true">Unidades</button><button id="byRev" aria-pressed="false">Receita</button>
+      </div>
+    </div>
+    <div id="rank"></div>
+  </div>
+</div>
 
 <footer>
-  Base: 100 registros de vendas, com nomes de vendedores padronizados (maiúsculas e minúsculas unificadas). Todas as vendas entram nas contagens, inclusive as de status cancelado. Empates são decididos pela receita.
+  Base: 100 registros de vendas, com nomes de vendedores padronizados. Todas as vendas entram nas contagens, inclusive as de status cancelado. Empates são decididos pela receita.
 </footer>
 </div>
 <div id="tip" role="tooltip"></div>
 
 <script>
 const DATA=[{"id":6,"m":"718 Cayman","f":"718","y":2022,"p":79500.0,"pay":"Credit Card","c":"Boston","st":"MA","s":"Kevin","ds":"Delivered"},{"id":7,"m":"911 Turbo S","f":"911","y":2024,"p":235000.0,"pay":"Wire Transfer","c":"Seattle","st":"WA","s":"Amanda Scott","ds":"Delivered"},{"id":8,"m":"Cayenne Coupe","f":"Cayenne","y":2023,"p":112750.0,"pay":"Financing","c":"Austin","st":"TX","s":"Brian Hall","ds":"In Transit"},{"id":9,"m":"Macan S","f":"Macan","y":2021,"p":68900.0,"pay":"Cash","c":"Denver","st":"CO","s":"Jessica","ds":"Pending"},{"id":10,"m":"Taycan 4S","f":"Taycan","y":2024,"p":121000.0,"pay":"Bank Transfer","c":"Los Angeles","st":"CA","s":"Thomas King","ds":"Delivered"},{"id":11,"m":"Panamera 4","f":"Panamera","y":2023,"p":104500.0,"pay":"Credit Card","c":"Miami","st":"FL","s":"Lisa Ray","ds":"Cancelled"},{"id":12,"m":"911 Carrera S","f":"911","y":2020,"p":96300.0,"pay":"Lease","c":"New York","st":"NY","s":"Mark Evans","ds":"Delivered"},{"id":13,"m":"Cayenne E-Hybrid","f":"Cayenne","y":2022,"p":89750.0,"pay":"Wire Transfer","c":"San Diego","st":"CA","s":"Nancy Reed","ds":"Pending Approval"},{"id":14,"m":"718 Boxster","f":"718","y":2021,"p":73500.0,"pay":"Debit Card","c":"Chicago","st":"IL","s":"George Bell","ds":"Shipped"},{"id":15,"m":"Macan GTS","f":"Macan","y":2024,"p":95000.0,"pay":"Financing","c":"Phoenix","st":"AZ","s":"Helen Brooks","ds":"In Transit"},{"id":16,"m":"Taycan Turbo","f":"Taycan","y":2023,"p":153200.5,"pay":"ACH Payment","c":"Dallas","st":"TX","s":"Samuel Price","ds":"Delivered"},{"id":17,"m":"911 GT3","f":"911","y":2024,"p":241000.0,"pay":"Wire Transfer","c":"Las Vegas","st":"NV","s":"Peter Ford","ds":"Pending"},{"id":18,"m":"Panamera Turbo S","f":"Panamera","y":2022,"p":132000.0,"pay":"Cash","c":"San Jose","st":"CA","s":"Angela Green","ds":"Delivered"},{"id":19,"m":"Cayenne Turbo GT","f":"Cayenne","y":2024,"p":188000.0,"pay":"Crypto Payment","c":"Houston","st":"TX","s":"Victor Stone","ds":"Awaiting Delivery"},{"id":20,"m":"911 Carrera Cabriolet","f":"911","y":2023,"p":127800.0,"pay":"Credit Card","c":"Atlanta","st":"GA","s":"Rachel Turner","ds":"Delivered"},{"id":21,"m":"Macan","f":"Macan","y":2021,"p":58900.0,"pay":"Bank Transfer","c":"Orlando","st":"FL","s":"Chris Moore","ds":"Pending"},{"id":22,"m":"718 Spyder RS","f":"718","y":2024,"p":164000.0,"pay":"Financing","c":"Portland","st":"OR","s":"Laura Hill","ds":"In Transit"},{"id":23,"m":"Taycan Cross Turismo","f":"Taycan","y":2023,"p":118500.0,"pay":"Wire Transfer","c":"Charlotte","st":"NC","s":"Martin Young","ds":"Delivered"},{"id":24,"m":"Cayenne S","f":"Cayenne","y":2022,"p":91300.0,"pay":"Credit Card","c":"Nashville","st":"TN","s":"Diana Cooper","ds":"Pending"},{"id":25,"m":"911 Targa 4S","f":"911","y":2024,"p":158750.0,"pay":"Lease","c":"Minneapolis","st":"MN","s":"Steve Gray","ds":"Delivered"},{"id":26,"m":"Panamera","f":"Panamera","y":2020,"p":72000.0,"pay":"Bank Transfer","c":"Philadelphia","st":"PA","s":"Olivia Ross","ds":"Cancelled"},{"id":27,"m":"Macan Electric","f":"Macan","y":2025,"p":86500.0,"pay":"Wire Transfer","c":"San Antonio","st":"TX","s":"Patrick Wood","ds":"Delivered"},{"id":28,"m":"911 Dakar","f":"911","y":2024,"p":270000.0,"pay":"Cash","c":"Salt Lake City","st":"UT","s":"Karen Diaz","ds":"Awaiting Pickup"},{"id":29,"m":"Taycan GTS","f":"Taycan","y":2023,"p":139000.0,"pay":"Financing","c":"Raleigh","st":"NC","s":"Justin Cox","ds":"In Transit"},{"id":30,"m":"Cayenne","f":"Cayenne","y":2021,"p":76800.0,"pay":"Credit Card","c":"Detroit","st":"MI","s":"Betty Ward","ds":"Delivered"},{"id":31,"m":"718 Cayman GT4 RS","f":"718","y":2024,"p":173600.0,"pay":"Wire Transfer","c":"Columbus","st":"OH","s":"Gary Reed","ds":"Pending"},{"id":32,"m":"911 Carrera GTS","f":"911","y":2022,"p":119900.0,"pay":"Cash","c":"Indianapolis","st":"IN","s":"Maria Foster","ds":"Delivered"},{"id":33,"m":"Panamera 4 E-Hybrid","f":"Panamera","y":2023,"p":109250.0,"pay":"Lease","c":"Fort Worth","st":"TX","s":"Harold Bennett","ds":"In Transit"},{"id":34,"m":"Macan T","f":"Macan","y":2022,"p":82000.0,"pay":"Wire Transfer","c":"Jacksonville","st":"FL","s":"Teresa Cook","ds":"Delivered"},{"id":35,"m":"Taycan Turbo S","f":"Taycan","y":2025,"p":214000.0,"pay":"Crypto Payment","c":"San Diego","st":"CA","s":"Frank Morgan","ds":"Pending Review"},{"id":36,"m":"911 Carrera","f":"911","y":2024,"p":124500.0,"pay":"Credit Card","c":"Tampa","st":"FL","s":"Natalie","ds":"Delivered"},{"id":37,"m":"Cayenne S","f":"Cayenne","y":2023,"p":98200.0,"pay":"Bank Transfer","c":"Sacramento","st":"CA","s":"Eric Woods","ds":"Pending"},{"id":38,"m":"Macan","f":"Macan","y":2022,"p":67500.0,"pay":"Financing","c":"Cleveland","st":"OH","s":"Patricia Fox","ds":"Delivered"},{"id":39,"m":"Taycan","f":"Taycan","y":2025,"p":116900.0,"pay":"Wire Transfer","c":"Milwaukee","st":"WI","s":"Alan Price","ds":"In Transit"},{"id":40,"m":"Panamera 4S","f":"Panamera","y":2024,"p":112000.0,"pay":"Cash","c":"Kansas City","st":"MO","s":"Sandra Hill","ds":"Delivered"},{"id":41,"m":"718 Boxster","f":"718","y":2021,"p":74000.0,"pay":"Debit Card","c":"Omaha","st":"NE","s":"Victor Lee","ds":"Cancelled"},{"id":42,"m":"911 Turbo","f":"911","y":2024,"p":198300.0,"pay":"Wire Transfer","c":"Albuquerque","st":"NM","s":"Monica","ds":"Awaiting Delivery"},{"id":43,"m":"Cayenne Coupe","f":"Cayenne","y":2023,"p":103750.0,"pay":"Wire Transfer","c":"Tucson","st":"AZ","s":"Gregory Adams","ds":"Pending Approval"},{"id":44,"m":"Macan GTS","f":"Macan","y":2024,"p":93600.0,"pay":"Financing","c":"Fresno","st":"CA","s":"Laura West","ds":"Shipped"},{"id":45,"m":"Taycan 4S","f":"Taycan","y":2025,"p":129000.0,"pay":"ACH Payment","c":"Virginia Beach","st":"VA","s":"Henry King","ds":"In Transit"},{"id":46,"m":"Panamera Turbo","f":"Panamera","y":2022,"p":136000.0,"pay":"Credit Card","c":"Colorado Springs","st":"CO","s":"Amber Clark","ds":"Delivered"},{"id":47,"m":"911 GT3 RS","f":"911","y":2024,"p":286500.0,"pay":"Wire Transfer","c":"Arlington","st":"TX","s":"Peter Lane","ds":"Pending"},{"id":48,"m":"Cayenne E-Hybrid","f":"Cayenne","y":2023,"p":92800.0,"pay":"Lease","c":"Bakersfield","st":"CA","s":"Grace Morris","ds":"Delivered"},{"id":49,"m":"Macan T","f":"Macan","y":2022,"p":72400.0,"pay":"Cash","c":"Mesa","st":"AZ","s":"Kyle Perry","ds":"Awaiting Pickup"},{"id":50,"m":"Taycan Turbo","f":"Taycan","y":2025,"p":158500.0,"pay":"Crypto Payment","c":"Atlanta","st":"GA","s":"Megan Reed","ds":"Delivered"},{"id":51,"m":"718 Cayman","f":"718","y":2021,"p":69900.0,"pay":"Bank Transfer","c":"Long Beach","st":"CA","s":"Carl Simmons","ds":"Pending"},{"id":52,"m":"911 Targa 4","f":"911","y":2024,"p":141250.0,"pay":"Financing","c":"Oakland","st":"CA","s":"Linda Cole","ds":"In Transit"},{"id":53,"m":"Panamera","f":"Panamera","y":2020,"p":71500.0,"pay":"Wire Transfer","c":"Tulsa","st":"OK","s":"Martin Brooks","ds":"Delivered"},{"id":54,"m":"Cayenne Turbo","f":"Cayenne","y":2023,"p":146800.0,"pay":"Credit Card","c":"Wichita","st":"KS","s":"Diana Long","ds":"Pending"},{"id":55,"m":"Macan Electric","f":"Macan","y":2025,"p":89700.0,"pay":"Lease","c":"New Orleans","st":"LA","s":"Steve Ross","ds":"Delivered"},{"id":56,"m":"911 Carrera S","f":"911","y":2022,"p":104600.0,"pay":"Bank Transfer","c":"Honolulu","st":"HI","s":"Olivia Cruz","ds":"Cancelled"},{"id":57,"m":"Taycan GTS","f":"Taycan","y":2024,"p":142000.0,"pay":"Wire Transfer","c":"Anaheim","st":"CA","s":"Patrick Wood","ds":"Delivered"},{"id":58,"m":"Cayenne","f":"Cayenne","y":2021,"p":78400.0,"pay":"Cash","c":"Henderson","st":"NV","s":"Karen Stone","ds":"Awaiting Review"},{"id":59,"m":"718 Spyder RS","f":"718","y":2025,"p":169000.0,"pay":"Financing","c":"Lexington","st":"KY","s":"Justin Fox","ds":"In Transit"},{"id":60,"m":"911 Dakar","f":"911","y":2024,"p":268900.0,"pay":"Credit Card","c":"Riverside","st":"CA","s":"Betty James","ds":"Delivered"},{"id":61,"m":"Panamera 4","f":"Panamera","y":2023,"p":101300.0,"pay":"Wire Transfer","c":"Corpus Christi","st":"TX","s":"Gary Price","ds":"Pending"},{"id":62,"m":"Macan S","f":"Macan","y":2021,"p":66750.0,"pay":"Cash","c":"St. Louis","st":"MO","s":"Maria Green","ds":"Delivered"},{"id":63,"m":"Taycan Cross Turismo","f":"Taycan","y":2024,"p":127900.0,"pay":"Lease","c":"Pittsburgh","st":"PA","s":"Harold Young","ds":"In Transit"},{"id":64,"m":"Cayenne Turbo GT","f":"Cayenne","y":2025,"p":200000.0,"pay":"Wire Transfer","c":"Cincinnati","st":"OH","s":"Teresa Ward","ds":"Delivered"},{"id":65,"m":"911 Carrera Cabriolet","f":"911","y":2023,"p":132000.0,"pay":"Crypto Payment","c":"Anchorage","st":"AK","s":"Frank Reed","ds":"Pending Review"},{"id":66,"m":"718 Cayman GT4 RS","f":"718","y":2024,"p":176400.0,"pay":"Credit Card","c":"Plano","st":"TX","s":"Angela Moore","ds":"Delivered"},{"id":67,"m":"Panamera 4 E-Hybrid","f":"Panamera","y":2022,"p":108500.0,"pay":"Bank Transfer","c":"Newark","st":"NJ","s":"Rachel West","ds":"Cancelled"},{"id":68,"m":"Macan","f":"Macan","y":2021,"p":59000.0,"pay":"Financing","c":"Greensboro","st":"NC","s":"Thomas Fox","ds":"Awaiting Delivery"},{"id":69,"m":"Taycan Turbo S","f":"Taycan","y":2025,"p":218000.0,"pay":"Wire Transfer","c":"Lincoln","st":"NE","s":"Lisa Dunn","ds":"Pending"},{"id":70,"m":"Cayenne S","f":"Cayenne","y":2024,"p":99950.0,"pay":"Debit Card","c":"Jersey City","st":"NJ","s":"Brian Allen","ds":"Delivered"},{"id":71,"m":"911 Carrera GTS","f":"911","y":2024,"p":121750.0,"pay":"Credit Card","c":"Chandler","st":"AZ","s":"George Hall","ds":"Delivered"},{"id":72,"m":"718 Boxster GTS","f":"718","y":2023,"p":91500.0,"pay":"Lease","c":"Reno","st":"NV","s":"Helen King","ds":"Shipped"},{"id":73,"m":"Panamera Turbo S","f":"Panamera","y":2022,"p":134000.0,"pay":"Wire Transfer","c":"Buffalo","st":"NY","s":"Samuel Price","ds":"In Transit"},{"id":74,"m":"Macan GTS","f":"Macan","y":2024,"p":96800.0,"pay":"ACH Payment","c":"Durham","st":"NC","s":"Peter Ford","ds":"Delivered"},{"id":75,"m":"Taycan 4S","f":"Taycan","y":2025,"p":131600.0,"pay":"Wire Transfer","c":"Laredo","st":"TX","s":"Angela Green","ds":"Pending Approval"},{"id":76,"m":"Cayenne E-Hybrid","f":"Cayenne","y":2023,"p":94300.0,"pay":"Cash","c":"Madison","st":"WI","s":"Victor Stone","ds":"Delivered"},{"id":77,"m":"911 Turbo S","f":"911","y":2025,"p":242000.0,"pay":"Crypto Payment","c":"Lubbock","st":"TX","s":"Rachel Turner","ds":"Awaiting Pickup"},{"id":78,"m":"718 Cayman S","f":"718","y":2022,"p":82750.0,"pay":"Credit Card","c":"Toledo","st":"OH","s":"Chris Moore","ds":"Cancelled"},{"id":79,"m":"Macan Electric","f":"Macan","y":2026,"p":91300.0,"pay":"Wire Transfer","c":"Irvine","st":"CA","s":"Laura Hill","ds":"Delivered"},{"id":80,"m":"Panamera","f":"Panamera","y":2021,"p":79900.0,"pay":"Financing","c":"Garland","st":"TX","s":"Martin Young","ds":"Pending"},{"id":81,"m":"Cayenne Coupe","f":"Cayenne","y":2024,"p":111000.0,"pay":"Bank Transfer","c":"Irving","st":"TX","s":"Diana Cooper","ds":"In Transit"},{"id":82,"m":"911 Targa 4S","f":"911","y":2023,"p":156500.0,"pay":"Cash","c":"Chesapeake","st":"VA","s":"Steve Gray","ds":"Delivered"},{"id":83,"m":"Taycan","f":"Taycan","y":2025,"p":119900.0,"pay":"Lease","c":"Scottsdale","st":"AZ","s":"Olivia Ross","ds":"Pending"},{"id":84,"m":"Macan T","f":"Macan","y":2022,"p":73200.0,"pay":"Wire Transfer","c":"Norfolk","st":"VA","s":"Patrick Wood","ds":"Delivered"},{"id":85,"m":"911 GT3","f":"911","y":2024,"p":224000.0,"pay":"Wire Transfer","c":"Boise","st":"ID","s":"Karen Diaz","ds":"Awaiting Delivery"},{"id":86,"m":"911 Carrera","f":"911","y":2024,"p":126900.0,"pay":"Credit Card","c":"Orlando","st":"FL","s":"Kevin Brown","ds":"Delivered"},{"id":87,"m":"Cayenne","f":"Cayenne","y":2023,"p":84500.0,"pay":"Bank Transfer","c":"San Jose","st":"CA","s":"Amanda Lee","ds":"Pending"},{"id":88,"m":"Macan S","f":"Macan","y":2022,"p":69800.0,"pay":"Financing","c":"Tampa","st":"FL","s":"Brian Hall","ds":"Delivered"},{"id":89,"m":"Taycan 4S","f":"Taycan","y":2025,"p":132700.0,"pay":"Wire Transfer","c":"Denver","st":"CO","s":"Jessica White","ds":"In Transit"},{"id":90,"m":"Panamera","f":"Panamera","y":2021,"p":81000.0,"pay":"Cash","c":"Austin","st":"TX","s":"Thomas King","ds":"Delivered"},{"id":91,"m":"718 Cayman","f":"718","y":2023,"p":78900.0,"pay":"Debit Card","c":"Seattle","st":"WA","s":"Victor Lee","ds":"Cancelled"},{"id":92,"m":"911 Turbo S","f":"911","y":2026,"p":249300.0,"pay":"Wire Transfer","c":"Boston","st":"MA","s":"Monica Green","ds":"Awaiting Delivery"},{"id":93,"m":"Cayenne Coupe","f":"Cayenne","y":2024,"p":108750.0,"pay":"Wire Transfer","c":"Phoenix","st":"AZ","s":"Gregory Adams","ds":"Pending Approval"},{"id":94,"m":"Macan Electric","f":"Macan","y":2026,"p":92600.0,"pay":"Financing","c":"Chicago","st":"IL","s":"Laura West","ds":"Shipped"},{"id":95,"m":"Taycan Turbo","f":"Taycan","y":2025,"p":164000.0,"pay":"ACH Payment","c":"Dallas","st":"TX","s":"Henry King","ds":"In Transit"},{"id":96,"m":"Panamera 4S","f":"Panamera","y":2024,"p":119000.0,"pay":"Credit Card","c":"San Francisco","st":"CA","s":"Amber Clark","ds":"Delivered"},{"id":97,"m":"911 GT3","f":"911","y":2026,"p":232500.0,"pay":"Wire Transfer","c":"Las Vegas","st":"NV","s":"Peter Lane","ds":"Pending"},{"id":98,"m":"Cayenne E-Hybrid","f":"Cayenne","y":2023,"p":96800.0,"pay":"Lease","c":"Charlotte","st":"NC","s":"Grace Morris","ds":"Delivered"},{"id":99,"m":"Macan T","f":"Macan","y":2022,"p":74400.0,"pay":"Cash","c":"Mesa","st":"AZ","s":"Kyle Perry","ds":"Awaiting Pickup"},{"id":100,"m":"Taycan GTS","f":"Taycan","y":2025,"p":148500.0,"pay":"Crypto Payment","c":"Atlanta","st":"GA","s":"Megan Reed","ds":"Delivered"},{"id":101,"m":"718 Boxster","f":"718","y":2021,"p":71900.0,"pay":"Bank Transfer","c":"Long Beach","st":"CA","s":"Carl Simmons","ds":"Pending"},{"id":102,"m":"911 Targa 4","f":"911","y":2024,"p":143250.0,"pay":"Financing","c":"Oakland","st":"CA","s":"Linda Cole","ds":"In Transit"},{"id":103,"m":"Panamera Turbo","f":"Panamera","y":2020,"p":137500.0,"pay":"Wire Transfer","c":"Tulsa","st":"OK","s":"Martin Brooks","ds":"Delivered"},{"id":104,"m":"Cayenne Turbo GT","f":"Cayenne","y":2025,"p":204800.0,"pay":"Credit Card","c":"Wichita","st":"KS","s":"Diana Long","ds":"Pending"},{"id":105,"m":"911 Dakar","f":"911","y":2024,"p":271700.0,"pay":"Lease","c":"New Orleans","st":"LA","s":"Steve Ross","ds":"Delivered"}];
+const NAMES={AK:'Alasca',AL:'Alabama',AR:'Arkansas',AZ:'Arizona',CA:'Califórnia',CO:'Colorado',CT:'Connecticut',DC:'Distrito de Columbia',DE:'Delaware',FL:'Flórida',GA:'Geórgia',HI:'Havaí',IA:'Iowa',ID:'Idaho',IL:'Illinois',IN:'Indiana',KS:'Kansas',KY:'Kentucky',LA:'Louisiana',MA:'Massachusetts',MD:'Maryland',ME:'Maine',MI:'Michigan',MN:'Minnesota',MO:'Missouri',MS:'Mississippi',MT:'Montana',NC:'Carolina do Norte',ND:'Dakota do Norte',NE:'Nebraska',NH:'New Hampshire',NJ:'Nova Jersey',NM:'Novo México',NV:'Nevada',NY:'Nova York',OH:'Ohio',OK:'Oklahoma',OR:'Oregon',PA:'Pensilvânia',RI:'Rhode Island',SC:'Carolina do Sul',SD:'Dakota do Sul',TN:'Tennessee',TX:'Texas',UT:'Utah',VA:'Virgínia',VT:'Vermont',WA:'Washington',WI:'Wisconsin',WV:'Virgínia Ocidental',WY:'Wyoming'};
+DATA.forEach(r=>r.e=NAMES[r.st]||r.st);
+const STAGES=[
+ {k:'Em aprovação',raw:{'Pending':'Pendente','Pending Approval':'Aprovação pendente','Pending Review':'Revisão pendente','Awaiting Review':'Aguardando revisão'}},
+ {k:'Em logística',raw:{'In Transit':'Em trânsito','Shipped':'Enviado','Awaiting Delivery':'Aguardando entrega','Awaiting Pickup':'Aguardando retirada'}},
+ {k:'Entregue',raw:{'Delivered':'Entregue'}},
+ {k:'Cancelada',raw:{'Cancelled':'Cancelada'}}];
 const FAM=['911','718','Cayenne','Macan','Panamera','Taycan'];
 const fmtN=n=>n.toLocaleString('pt-BR');
 const pct=x=>(x*100).toLocaleString('pt-BR',{maximumFractionDigits:0})+'%';
@@ -248,7 +196,7 @@ const join=a=>a.length<3?a.join(' e '):a.slice(0,-1).join(', ')+' e '+a[a.length
 
 const DEFS=[
   {k:'m',label:'Modelo',sort:(a,b)=>a.localeCompare(b,'pt')},
-  {k:'c',label:'Cidade',sort:(a,b)=>a.localeCompare(b,'pt')},
+  {k:'e',label:'Estado',sort:(a,b)=>a.localeCompare(b,'pt')},
   {k:'y',label:'Ano do modelo',sort:(a,b)=>b-a},
   {k:'pay',label:'Pagamento',sort:(a,b)=>a.localeCompare(b,'pt')},
   {k:'s',label:'Vendedor',sort:(a,b)=>a.localeCompare(b,'pt')}
@@ -262,7 +210,7 @@ function buildFilters(){
     const counts={};DATA.forEach(r=>counts[r[d.k]]=(counts[r[d.k]]||0)+1);
     const opts=Object.keys(counts).map(v=>d.k==='y'?+v:v).sort(d.sort);
     const el=document.createElement('div');el.className='ms';el.dataset.k=d.k;
-    el.innerHTML=`<button class="ms-btn" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="ms-l">${d.label}</span><span class="ms-v">Todos</span></button>
+    el.innerHTML=`<span class="ms-l">${d.label}</span><button class="ms-btn" type="button" aria-haspopup="listbox" aria-expanded="false"><span class="ms-v">Todos</span></button>
     <div class="ms-panel" hidden><input type="search" id="q-${d.k}" placeholder="Buscar ${d.label.toLowerCase()}" aria-label="Buscar ${d.label}"><div class="ms-list"></div><div class="ms-foot"><span class="cnt"></span><button type="button" class="clr">Limpar</button></div></div>`;
     const list=el.querySelector('.ms-list');
     list.innerHTML=opts.map((v,i)=>`<label data-t="${esc(String(v).toLowerCase())}"><input type="checkbox" id="o-${d.k}-${i}" value="${esc(v)}"><span>${esc(v)}</span><em>${counts[v]}</em></label>`).join('');
@@ -299,45 +247,39 @@ const tipAttr=t=>`data-tip="${esc(t)}"`;
 
 function renderKPIs(rows,tot){
   const n=rows.length,rev=tot;
-  const cities=new Set(rows.map(r=>r.c)).size,sellers=new Set(rows.map(r=>r.s)).size;
+  const states=new Set(rows.map(r=>r.st)).size,sellers=new Set(rows.map(r=>r.s)).size;
   const lead=n?leaders(rows):[];
   const fam=FAM.map(f=>({k:f,rev:rows.filter(x=>x.f===f).reduce((a,x)=>a+x.p,0)})).sort((a,b)=>b.rev-a.rev)[0];
   $('#kpis').innerHTML=`
-   <div class="kpi"><div class="eyebrow">Veículos vendidos</div><div class="v">${fmtN(n)}</div><div class="s">${cities} cidades · ${sellers} vendedores</div></div>
+   <div class="kpi"><div class="eyebrow">Veículos vendidos</div><div class="v">${fmtN(n)}</div><div class="s">${states} estados · ${sellers} vendedores</div></div>
    <div class="kpi"><div class="eyebrow">Receita total</div><div class="v">${n?usdC(rev):'–'}</div><div class="s">${n?usd(rev):'&nbsp;'}</div></div>
    <div class="kpi"><div class="eyebrow">Ticket médio</div><div class="v">${n?usd(rev/n):'–'}</div><div class="s">por veículo</div></div>
    <div class="kpi"><div class="eyebrow">Família líder em receita</div><div class="v">${n&&fam.rev?fam.k:'–'}</div><div class="s">${n&&fam.rev?pct(fam.rev/rev)+' da receita':'&nbsp;'}</div></div>`;
 }
 
-function renderBrief(rows,tot,cg,fg,sg){
-  if(!rows.length){$('#brief').innerHTML='<div class="empty" style="grid-column:1/-1;padding:8px 0">Nenhuma venda neste recorte.</div>';return}
-  const cl=cg.filter(c=>c.n===cg[0].n);
-  const c1=cl.length===1?`<b>${esc(cl[0].k)}</b> é a cidade que mais vendeu, com <b class="lead">${cl[0].n} unid.</b> (${pct(cl[0].n/rows.length)} do total).`:`<b>${cl.length} cidades</b> empatam na liderança, com <b class="lead">${cl[0].n} unid.</b> cada.`;
-  const f=fg[0];
-  const c2=`<b>${esc(f.k)}</b> é a família que mais gera receita: <b class="lead">${usdC(f.rev)}</b>, ${pct(f.rev/tot)} do total.`;
-  const s=sg[0];
-  const c3=`<b>${esc(s.k)}</b> lidera o ranking de vendedores com <b class="lead">${s.n} unid.</b> e ${usdC(s.rev)} em receita.`;
-  $('#brief').innerHTML=`<div><h4>Cidade</h4><p>${c1}</p></div><div><h4>Família</h4><p>${c2}</p></div><div><h4>Vendedor</h4><p>${c3}</p></div>`;
-}
-
 function renderCities(rows,tot,cg,fg){
-  const n=rows.length,top=cg.slice(0,10);
-  const mx=top.length?top[0].n:1,ax=niceAxis(mx),ticks=[];for(let t=0;t<=ax.top;t+=ax.step)ticks.push(t);
-  const share=top.reduce((a,c)=>a+c.n,0)/(n||1);
-  $('#cityIns').innerHTML=n?`As ${top.length} maiores cidades somam <b>${pct(share)}</b> das unidades. A venda está pulverizada: ${cg.filter(c=>c.n===1).length} das ${cg.length} cidades têm apenas 1 unidade.`:'';
-  $('#cityBars').innerHTML=top.length?top.map((c,i)=>{
-    const L=leaders(c.rows),tie=L.length>1,lm=tie?'Empate entre '+L.length+' modelos':L[0].k;
-    const w=c.n/ax.top*100,lead=c.n===mx;
-    const tip=c.k+' · '+c.n+' unid. · '+usdC(c.rev)+'\n'+group(c.rows,'m').sort(byNR).map(m=>m.k+': '+m.n).join('\n');
-    return `<div class="cr c1"><div class="pos">${i+1}</div><div class="city" title="${esc(c.k)}">${esc(c.k)}<small>${esc(lm)}</small></div>
-      <div class="plot" ${tipAttr(tip)}><div class="bar${lead?' lead':''}" style="width:${w}%"></div><span class="val" style="left:${w}%">${c.n}</span></div>
-      <div class="lm">${tie?esc(lm):'<b>'+esc(lm)+'</b>'}</div></div>`}).join('')
-    :'<div class="empty">Nenhuma venda neste recorte.</div>';
+  const n=rows.length;
+
+  // status das vendas (pizza, só quantidades)
+  const sg=STAGES.map(s=>{const r=rows.filter(x=>s.raw[x.ds]);return {k:s.k,n:r.length,rev:r.reduce((a,x)=>a+x.p,0),det:Object.entries(s.raw).map(([raw,pt])=>({pt,n:r.filter(x=>x.ds===raw).length})).filter(d=>d.n).sort((a,b)=>b.n-a.n)}});
+  const BASE={'Entregue':['var(--bar)','#010205'],'Em logística':['var(--fg)','var(--bg)'],'Em aprovação':['var(--muted)','#FFFFFF'],'Cancelada':['var(--soft)','#010205']};
+  const smx=Math.max(...sg.map(s=>s.n),0),live=sg.filter(s=>s.n>0);
+  const col=s=>s.n===smx?['var(--lead)','#FFFFFF']:BASE[s.k];
+  let ang=-Math.PI/2;const R=100,C=110;
+  const pt=(a,r)=>[C+r*Math.cos(a),C+r*Math.sin(a)];
+  const slices=live.map(s=>{const da=s.n/n*Math.PI*2,a0=ang,a1=ang+da;ang=a1;
+    const tip=tipAttr(s.k+'\n'+s.n+' unid. · '+usd(s.rev)),[f,tc]=col(s);
+    let shape;
+    if(live.length===1)shape=`<circle class="sl" cx="${C}" cy="${C}" r="${R}" fill="${f}" ${tip}/>`;
+    else{const [x0,y0]=pt(a0,R),[x1,y1]=pt(a1,R);shape=`<path class="sl" d="M${C} ${C} L${x0.toFixed(2)} ${y0.toFixed(2)} A${R} ${R} 0 ${da>Math.PI?1:0} 1 ${x1.toFixed(2)} ${y1.toFixed(2)} Z" fill="${f}" ${tip}/>`}
+    const [lx,ly]=live.length===1?[C,C]:pt((a0+a1)/2,R*.62);
+    return shape+(da>.32||live.length===1?`<text class="num" x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" fill="${tc}">${s.n}</text>`:'')}).join('');
+  $('#stPie').innerHTML=n?`<svg viewBox="0 0 220 220" role="img" aria-label="Vendas por status">${slices}</svg>
+    <div class="plg">${sg.map(s=>`<div class="pl"><i style="background:${col(s)[0]}"></i><b>${s.k}</b><span class="n">${s.n}</span>${s.det.length>1?'<small>'+s.det.map(d=>d.pt+' '+d.n).join(' · ')+'</small>':''}</div>`).join('')}</div>`:'<div class="empty">Nenhuma venda neste recorte.</div>';
 
   // famílias por receita
   const fr=FAM.map(f=>{const r=rows.filter(x=>x.f===f);return {k:f,n:r.length,rev:r.reduce((a,x)=>a+x.p,0),rows:r}}).filter(x=>x.n).sort(byRN);
   const fmax=fr.length?fr[0].rev:1;
-  $('#famIns').innerHTML=fr.length?`<b>${esc(fr[0].k)}</b> concentra ${pct(fr[0].rev/tot)} da receita${fr.length>1?`; ${esc(fr[1].k)} vem em seguida com ${pct(fr[1].rev/tot)}`:''}.`:'';
   $('#famBars').innerHTML=fr.length?fr.map((f,i)=>{const w=f.rev/fmax*100;
     return `<div class="cr c2"><div class="nm">${f.k}<small>${f.n} unid. · ${usdC(f.rev/f.n)}/veíc.</small></div>
       <div class="plot" ${tipAttr(f.k+'\n'+f.n+' unid.\n'+usd(f.rev)+' · '+pct(f.rev/tot))}><div class="bw"><div class="bar${i===0?' lead':''}" style="width:${w}%"></div></div><span class="val">${usdC(f.rev)} · ${pct(f.rev/tot)}</span></div></div>`}).join(''):'<div class="empty">Nenhuma venda neste recorte.</div>';
@@ -354,7 +296,6 @@ function renderCities(rows,tot,cg,fg){
 
 function renderRank(rows,tot,sg){
   const g=sg.slice(0,5);
-  $('#rankIns').textContent=g.length?`Os 5 primeiros respondem por ${pct(g.reduce((a,s)=>a+s.rev,0)/tot)} da receita. Em negrito, o modelo mais vendido por cada um.`:'';
   $('#rank').innerHTML=g.length?`<div class="tw"><table><thead><tr><th style="width:44px">#</th><th>Vendedor</th><th class="r">Unid.</th><th class="r">Receita</th><th class="r">% receita</th><th>Modelos vendidos</th></tr></thead><tbody>`+g.map((s,i)=>{
     const ms=group(s.rows,'m').sort(byNR),mx=ms[0].n,all=ms.every(m=>m.n===mx);
     return `<tr><td class="no${i===0?' first':''}">${i+1}</td><td><strong>${esc(s.k)}</strong></td><td class="r">${s.n}</td><td class="r">${usdC(s.rev)}</td><td class="r">${pct(s.rev/tot)}</td>
@@ -363,7 +304,7 @@ function renderRank(rows,tot,sg){
 
 function update(){
   syncLabels();const rows=filtered(),tot=rows.reduce((a,r)=>a+r.p,0);
-  const cg=group(rows,'c').sort(byNR);
+  const cg=group(rows,'st').sort(byNR);
   const fg=FAM.map(f=>{const r=rows.filter(x=>x.f===f);return {k:f,n:r.length,rev:r.reduce((a,x)=>a+x.p,0)}}).filter(x=>x.n).sort(byRN);
   const sg=group(rows,'s').sort(rankBy==='units'?byNR:byRN);
   renderKPIs(rows,tot);renderCities(rows,tot,cg,fg);renderRank(rows,tot,sg);
